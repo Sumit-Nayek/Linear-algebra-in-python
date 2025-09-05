@@ -321,12 +321,8 @@
 - [Overview](#overview)  
 - [Features](#features)  
 - [Getting Started](#getting-started)  
-  - [Prerequisites](#prerequisites)  
-  - [Installation](#installation)  
 - [Usage](#usage)  
   - [Examples](#examples)  
-- [Contributing](#contributing)  
-- [License](#license)  
 - [Acknowledgements](#acknowledgements)
 
 ---
