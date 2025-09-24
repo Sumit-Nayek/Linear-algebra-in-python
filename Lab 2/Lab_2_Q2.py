@@ -56,3 +56,19 @@ print("\nInverse of A:")
 inv = inverse_matrix(A)
 for row in inv:
     print(row)
+
+import numpy as np
+# Example
+A = [[1, 1, 3, 7],[1, 1, 3, 5],
+[10, 2, 1, 9],
+[3, 2, 4, 5]]
+# Convert the list of lists to a NumPy array
+A_np = np.array(A)
+print("Matrix A:")
+for row in A:
+    print(row)
+print("\nDeterminant of A:", determinant(A_np))
+print("\nInverse of A:")
+inv = inverse_matrix(A_np)
+for row in inv:
+    print(row)
