@@ -35,7 +35,7 @@ for i in range(n):
     cols = st.columns(n)
     row = []
     for j in range(n):
-        val = cols[j].number_input(f"R{i+1}C{j+1}", value=0.0, key=f"{i}{j}")
+        val = cols[j].number_input(f"R{i+1}C{j+1}", value=0, key=f"{i}{j}")
         row.append(val)
     matrix.append(row)
 
