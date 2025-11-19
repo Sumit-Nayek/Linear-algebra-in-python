@@ -321,9 +321,6 @@
 - [Overview](#overview)  
 - [Features](#features)  
 - [Getting Started](#getting-started)  
-- [Usage](#usage)  
-  - [Examples](#examples)  
-- [Acknowledgements](#acknowledgements)
 
 ---
 
