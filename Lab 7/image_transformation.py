@@ -47,3 +47,5 @@ axes[0].axis("off")
 axes[1].imshow(new_img)
 axes[1].set_title("Reconstructed Image")
 axes[1].axis("off")
+
+plt.show()
