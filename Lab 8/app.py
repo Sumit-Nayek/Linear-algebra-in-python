@@ -1,5 +1,5 @@
 ### Power method application
-### Problem statement: Use the power method and write a complete python program to find the dominant eigen value of a n by n square matrix. Input will be flexible to the user input and error tolarance and final output will be dominant egen value and egien vector
+### Use the power method and write a complete python program to find the dominant eigen value of a n by n square matrix. Input will be flexible to the user input and error tolarance and final output will be dominant egen value and egien vector
 import numpy as np
 import streamlit as st
 
