@@ -15,6 +15,8 @@ if 'rk_results' not in st.session_state:
     st.session_state.rk_results = None
 if 'image_processed' not in st.session_state:
     st.session_state.image_processed = False
+if 'function_input' not in st.session_state:
+    st.session_state.function_input = "x + y - 2"
 
 # Sidebar for method selection
 method = st.sidebar.selectbox(
@@ -34,12 +36,32 @@ if method == "Runge-Kutta 2nd Order Method":
         
         # Function input
         st.markdown("**Enter the function f(x, y) for dy/dx = f(x, y)**")
-        default_function = "x + y - 2"
+        
+        # Example functions
+        examples = {
+            "Select an example": "x + y - 2",
+            "Simple Linear": "x + y",
+            "Exponential Growth": "0.5 * y",
+            "Trigonometric": "sin(x) + cos(y)",
+            "Polynomial": "x**2 + y**2 - 1",
+            "Mixed Function": "x * y + 2",
+            "Decay Function": "-0.1 * y"
+        }
+        
+        example_choice = st.selectbox("Or choose an example:", list(examples.keys()))
+        
+        # Update function input when example is selected
+        if example_choice != "Select an example":
+            st.session_state.function_input = examples[example_choice]
+        
         function_input = st.text_input(
             "f(x, y):",
-            value=default_function,
+            value=st.session_state.function_input,
             help="Examples: x + y, x**2 + y, sin(x) + cos(y)"
         )
+        
+        # Update session state with current input
+        st.session_state.function_input = function_input
         
         # Numerical parameters
         x0 = st.number_input("Initial x (x0):", value=0.0, format="%.6f")
@@ -60,18 +82,15 @@ if method == "Runge-Kutta 2nd Order Method":
           k₂ = h*f(xₙ + h, yₙ + k₁)
         """)
         
-        st.markdown("**Example Functions:**")
-        examples = {
-            "Simple Linear": "x + y",
-            "Exponential": "y - x**2 + 1",
-            "Trigonometric": "sin(x) + cos(y)",
-            "Polynomial": "x**2 + y**2 - 1"
-        }
-        
-        example_choice = st.selectbox("Try examples:", list(examples.keys()))
-        if st.button("Load Example Function"):
-            function_input = examples[example_choice]
-            st.rerun()
+        st.subheader("📝 Function Examples")
+        st.markdown("""
+        **Try these examples:**
+        - `x + y` (Linear)
+        - `0.5 * y` (Exponential growth)
+        - `sin(x) + cos(y)` (Trigonometric)
+        - `x**2 + y**2 - 1` (Polynomial)
+        - `-0.1 * y` (Exponential decay)
+        """)
 
     # Runge-Kutta implementation
     def runge_kutta_2nd(f, x0, y0, h, steps):
@@ -112,6 +131,7 @@ if method == "Runge-Kutta 2nd Order Method":
                     
             except Exception as e:
                 st.error(f"Error in function: {str(e)}")
+                st.info("💡 **Tip:** Make sure your function uses valid Python syntax and supported functions.")
 
     # Display RK results
     if st.session_state.rk_results:
