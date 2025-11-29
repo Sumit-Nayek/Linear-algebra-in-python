@@ -377,11 +377,6 @@ else:
     4. **Download** the text file and reconstructed image
     5. **Compare** original vs reconstructed images
     
-    **Features:**
-    - Converts RGB pixel values to text format
-    - Maintains image dimensions in output
-    - Allows reconstruction from text data
-    - Suitable for image processing applications
     
     **Note:** Larger images will take longer to process
     """)
