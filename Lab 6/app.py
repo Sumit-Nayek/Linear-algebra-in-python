@@ -1,7 +1,5 @@
 import streamlit as st
 import numpy as np
-import matplotlib.pyplot as plt
-import sympy as sp
 from math import *
 
 st.set_page_config(page_title="Numerical Methods Calculator", layout="wide")
@@ -43,6 +41,7 @@ with col2:
         - Numerical integration method
         - Highly accurate for polynomial functions
         - Uses 3 specific points with optimized weights
+        - Input: Lower and upper limits a, b
         """)
     elif method == "False Position Method":
         st.info("""
@@ -50,6 +49,7 @@ with col2:
         - Root-finding method
         - Combines bisection and secant methods
         - Requires two initial guesses with opposite signs
+        - Input: x0, x1 (bracketing interval)
         """)
     else:
         st.info("""
@@ -58,6 +58,7 @@ with col2:
         - Requires function derivative
         - Needs one initial guess
         - May not converge for some functions
+        - Input: x0 (initial guess)
         """)
 
 # Function parser with error handling
@@ -252,6 +253,10 @@ if method in st.session_state.results:
     st.subheader("📊 Results")
     result_data = st.session_state.results[method]
     
+    # Display function and parameters
+    st.write(f"**Function:** f(x) = {result_data['function']}")
+    st.write(f"**Parameters:** {result_data['parameters']}")
+    
     if method == "Gauss Quadrature (3 points)":
         st.success(f"**Integral Value:** {result_data['result']:.8f}")
         st.latex(fr"\int_{{{a}}}^{{{b}}} {function_input} \, dx \approx {result_data['result']:.6f}")
@@ -291,89 +296,64 @@ if method in st.session_state.results:
             if len(root_result['iterations']) > 10:
                 st.info(f"Showing first 10 of {len(root_result['iterations'])} iterations")
 
-# Plot the function
-st.subheader("📈 Function Visualization")
+# Function evaluation section
+st.subheader("🔍 Function Evaluation")
+col_eval1, col_eval2 = st.columns(2)
 
-plot_col1, plot_col2 = st.columns([2, 1])
-
-with plot_col1:
-    # Determine plot range based on method
-    if method == "Gauss Quadrature (3 points)":
-        x_min, x_max = a - 1, b + 1
-    elif method in st.session_state.results:
-        root_result = st.session_state.results[method]['result']
-        if 'root' in root_result:
-            root_val = root_result['root']
-            x_min, x_max = root_val - 3, root_val + 3
-        else:
-            x_min, x_max = -5, 5
-    else:
-        x_min, x_max = -5, 5
-    
-    # Generate plot data
-    x_vals = np.linspace(x_min, x_max, 400)
-    y_vals = []
-    valid_points = []
-    
-    for x in x_vals:
-        y = parse_function(function_input, x)
-        if y is not None and abs(y) < 1e6:  # Filter out extreme values
-            y_vals.append(y)
-            valid_points.append(x)
-    
-    if len(valid_points) > 1:
-        fig, ax = plt.subplots(figsize=(10, 6))
-        ax.plot(valid_points, y_vals, 'b-', linewidth=2, label=f'f(x) = {function_input}')
-        ax.axhline(y=0, color='k', linestyle='-', alpha=0.3)
-        ax.axvline(x=0, color='k', linestyle='-', alpha=0.3)
-        ax.grid(True, alpha=0.3)
-        ax.set_xlabel('x')
-        ax.set_ylabel('f(x)')
-        ax.set_title(f'Function: {function_input}')
-        ax.legend()
-        
-        # Highlight important points
-        if method in st.session_state.results:
-            result_data = st.session_state.results[method]
-            if method == "Gauss Quadrature (3 points)":
-                ax.axvline(x=a, color='r', linestyle='--', alpha=0.7, label=f'Lower limit (a={a})')
-                ax.axvline(x=b, color='g', linestyle='--', alpha=0.7, label=f'Upper limit (b={b})')
-                ax.fill_between(valid_points, y_vals, where=[(x >= a and x <= b) for x in valid_points], 
-                              alpha=0.3, color='orange', label='Integration area')
-                ax.legend()
+with col_eval1:
+    eval_x = st.number_input("Evaluate f(x) at x =", value=0.0, format="%.6f")
+    if st.button("Evaluate Function"):
+        if function_input:
+            result = parse_function(function_input, eval_x)
+            if result is not None:
+                st.write(f"f({eval_x}) = {result:.8f}")
             else:
-                root_result = result_data['result']
-                if 'root' in root_result:
-                    root_x = root_result['root']
-                    root_y = parse_function(function_input, root_x)
-                    if root_y is not None:
-                        ax.plot(root_x, root_y, 'ro', markersize=8, label=f'Root ({root_x:.4f})')
-                        ax.legend()
-        
-        st.pyplot(fig)
-    else:
-        st.warning("Could not generate plot for the given function")
+                st.error("Error evaluating function at this point")
 
-with plot_col2:
-    st.subheader("ℹ️ Instructions")
-    st.markdown("""
-    1. **Enter your function** using Python math syntax
-    2. **Select method** from dropdown
-    3. **Set parameters** for the chosen method
-    4. **Click Calculate** to see results
-    5. **View visualization** of the function
+with col_eval2:
+    st.subheader("📝 Examples")
+    examples = {
+        "Quadratic": "x**2 - 4",
+        "Trigonometric": "sin(x) + cos(x)",
+        "Exponential": "exp(x) - 2",
+        "Logarithmic": "log(x + 1)",
+        "Polynomial": "x**3 - 2*x + 1"
+    }
     
-    **Supported functions:**
-    - Basic: +, -, *, /, **
-    - Trig: sin, cos, tan, asin, acos, atan
-    - Hyperbolic: sinh, cosh, tanh
-    - Exponential: exp, log, log10
-    - Constants: pi, e
-    """)
+    example_choice = st.selectbox("Try example functions:", list(examples.keys()))
+    if st.button("Load Example"):
+        st.session_state.function_string = examples[example_choice]
+        st.rerun()
+
+# Instructions section
+st.subheader("ℹ️ Instructions")
+st.markdown("""
+### How to Use:
+1. **Enter your function** using Python math syntax in the input box
+2. **Select numerical method** from the dropdown menu
+3. **Set the required parameters** for your chosen method
+4. **Click the Calculate button** to compute the result
+5. **View results** in the output section
+
+### Supported Mathematical Functions:
+- **Basic operations**: +, -, *, /, ** (power)
+- **Trigonometric**: sin(x), cos(x), tan(x), asin(x), acos(x), atan(x)
+- **Hyperbolic**: sinh(x), cosh(x), tanh(x)
+- **Exponential & Logarithmic**: exp(x), log(x), log10(x)
+- **Square root**: sqrt(x)
+- **Constants**: pi, e
+- **Absolute value**: abs(x)
+
+### Method Requirements:
+- **Gauss Quadrature**: Lower and upper integration limits (a, b)
+- **False Position**: Two initial guesses with opposite function signs
+- **Newton-Raphson**: One initial guess (function should be differentiable)
+""")
 
 # Footer
 st.markdown("---")
 st.markdown(
     "**Numerical Methods Calculator** | "
-    "Gauss Quadrature • False Position • Newton-Raphson"
+    "Gauss Quadrature • False Position • Newton-Raphson | "
+    "Made with Streamlit"
 )
