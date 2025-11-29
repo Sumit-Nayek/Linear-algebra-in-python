@@ -2,7 +2,6 @@ import streamlit as st
 import numpy as np
 from PIL import Image
 import io
-import matplotlib.pyplot as plt
 
 st.set_page_config(page_title="Numerical & Image Processing Tools", layout="wide")
 
@@ -71,7 +70,7 @@ if method == "Runge-Kutta 2nd Order Method":
         
         example_choice = st.selectbox("Try examples:", list(examples.keys()))
         if st.button("Load Example Function"):
-            st.session_state.function_input = examples[example_choice]
+            function_input = examples[example_choice]
             st.rerun()
 
     # Runge-Kutta implementation
@@ -123,31 +122,53 @@ if method == "Runge-Kutta 2nd Order Method":
         x_final, y_final = results[-1]
         st.success(f"**Final value:** y({x_final:.4f}) ≈ {y_final:.6f}")
         
-        # Display results table
-        st.subheader("Iteration Details")
-        results_data = []
-        for i, (x, y) in enumerate(results):
-            results_data.append({
-                'Step': i,
-                'x': f"{x:.6f}",
-                'y': f"{y:.6f}"
-            })
+        # Display results in an expandable table
+        with st.expander("View All Iterations", expanded=True):
+            results_data = []
+            for i, (x, y) in enumerate(results):
+                results_data.append({
+                    'Step': i,
+                    'x': f"{x:.6f}",
+                    'y(x)': f"{y:.6f}"
+                })
+            
+            st.dataframe(results_data, use_container_width=True)
         
-        st.dataframe(results_data, use_container_width=True)
+        # Display solution progression
+        st.subheader("📈 Solution Progression")
         
-        # Plot the results
-        st.subheader("📈 Solution Plot")
-        x_vals = [p[0] for p in results]
-        y_vals = [p[1] for p in results]
+        # Create a simple text-based visualization
+        col_prog1, col_prog2, col_prog3 = st.columns(3)
         
-        fig, ax = plt.subplots(figsize=(10, 6))
-        ax.plot(x_vals, y_vals, 'bo-', linewidth=2, markersize=4, label="RK2 Solution")
-        ax.set_xlabel("x")
-        ax.set_ylabel("y")
-        ax.set_title(f"Runge-Kutta 2nd Order Solution for dy/dx = {function_input}")
-        ax.grid(True, alpha=0.3)
-        ax.legend()
-        st.pyplot(fig)
+        with col_prog1:
+            st.metric("Initial x", f"{x0:.4f}")
+            st.metric("Initial y", f"{y0:.4f}")
+        
+        with col_prog2:
+            st.metric("Final x", f"{x_final:.4f}")
+            st.metric("Final y", f"{y_final:.4f}")
+        
+        with col_prog3:
+            st.metric("Total Steps", steps)
+            st.metric("Step Size", f"{h:.4f}")
+        
+        # Show key points
+        st.subheader("🔍 Key Points")
+        key_points = [
+            results[0],  # Initial point
+            results[len(results)//2],  # Mid point
+            results[-1]  # Final point
+        ]
+        
+        for i, (x, y) in enumerate(key_points):
+            if i == 0:
+                point_name = "Initial Point"
+            elif i == 1:
+                point_name = "Mid Point"
+            else:
+                point_name = "Final Point"
+            
+            st.write(f"**{point_name}:** x = {x:.4f}, y = {y:.4f}")
 
 else:  # Image to Text Converter
     st.header("🖼️ Image to Text Converter")
@@ -231,7 +252,8 @@ else:  # Image to Text Converter
                             'processed': processed_img,
                             'reconstructed': reconstructed_img,
                             'array_shape': img_array.shape,
-                            'pixel_count': img_array.size
+                            'pixel_count': img_array.size,
+                            'new_size': new_size
                         }
                         
                         st.success("✅ Conversion successful!")
@@ -245,52 +267,65 @@ else:  # Image to Text Converter
         
         st.subheader("📋 Conversion Results")
         
+        # Display both images side by side
+        col_orig, col_recon = st.columns(2)
+        
+        with col_orig:
+            st.image(data['original'], caption=f"Original Image ({data['original'].size})", use_column_width=True)
+        
+        with col_recon:
+            st.image(data['reconstructed'], caption=f"Reconstructed Image ({data['new_size']})", use_column_width=True)
+        
+        # Statistics and download section
+        st.subheader("📊 Conversion Statistics")
+        
         col_stats, col_download = st.columns([2, 1])
         
         with col_stats:
-            st.write(f"**Processed size:** {data['processed'].size}")
+            st.write(f"**Original dimensions:** {data['original'].size}")
+            st.write(f"**Processed dimensions:** {data['new_size']}")
             st.write(f"**Array shape:** {data['array_shape']}")
-            st.write(f"**Total pixels:** {data['pixel_count']:,}")
+            st.write(f"**Total pixels processed:** {data['pixel_count']:,}")
+            st.write(f"**Data points in text file:** {data['pixel_count']:,}")
             
             # Show sample of text data
             try:
-                with open("converted_pixels.txt", "r") as f:
-                    lines = f.readlines()[:10]  # First 10 lines
-                st.subheader("Sample Text Data (First 10 lines):")
-                st.code(''.join(lines), language='text')
-            except:
-                pass
+                with st.expander("View Sample Text Data (First 10 lines)"):
+                    with open("converted_pixels.txt", "r") as f:
+                        lines = f.readlines()[:10]
+                    for line in lines:
+                        st.text(line.strip())
+            except Exception as e:
+                st.error(f"Error reading text file: {e}")
         
         with col_download:
-            st.subheader("📥 Download")
+            st.subheader("📥 Download Files")
             
             # Download text file
-            with open("converted_pixels.txt", "rb") as file:
-                st.download_button(
-                    label="📄 Download Text File",
-                    data=file,
-                    file_name="converted_pixels.txt",
-                    mime="text/plain"
-                )
+            try:
+                with open("converted_pixels.txt", "rb") as file:
+                    st.download_button(
+                        label="📄 Download Text File",
+                        data=file,
+                        file_name="converted_pixels.txt",
+                        mime="text/plain",
+                        use_container_width=True
+                    )
+            except:
+                st.error("Text file not available for download")
             
             # Download reconstructed image
-            with open("reconstructed_image.jpg", "rb") as file:
-                st.download_button(
-                    label="🖼️ Download Reconstructed Image",
-                    data=file,
-                    file_name="reconstructed_image.jpg",
-                    mime="image/jpeg"
-                )
-        
-        # Display comparison
-        st.subheader("🔄 Before & After Comparison")
-        comp_col1, comp_col2 = st.columns(2)
-        
-        with comp_col1:
-            st.image(data['original'], caption="Original Image", use_column_width=True)
-        
-        with comp_col2:
-            st.image(data['reconstructed'], caption="Reconstructed Image", use_column_width=True)
+            try:
+                with open("reconstructed_image.jpg", "rb") as file:
+                    st.download_button(
+                        label="🖼️ Download Reconstructed Image",
+                        data=file,
+                        file_name="reconstructed_image.jpg",
+                        mime="image/jpeg",
+                        use_container_width=True
+                    )
+            except:
+                st.error("Reconstructed image not available for download")
 
 # Instructions section
 st.markdown("---")
@@ -303,13 +338,15 @@ if method == "Runge-Kutta 2nd Order Method":
     2. **Set initial conditions** (x₀, y₀)
     3. **Choose step size** (h) and number of steps
     4. **Click 'Solve ODE'** to compute the solution
-    5. **View results** in table and plot format
+    5. **View results** in the detailed table
     
     **Function Syntax:**
     - Use `x` and `y` as variables
     - Supported: `+`, `-`, `*`, `/`, `**`
     - Functions: `sin(x)`, `cos(x)`, `exp(x)`, `log(x)`, `sqrt(x)`
     - Constants: `pi`, `e`
+    
+    **Example:** For dy/dx = x + y, enter `x + y`
     """)
 else:
     st.markdown("""
@@ -325,6 +362,8 @@ else:
     - Maintains image dimensions in output
     - Allows reconstruction from text data
     - Suitable for image processing applications
+    
+    **Note:** Larger images will take longer to process
     """)
 
 # Footer
