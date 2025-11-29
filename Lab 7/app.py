@@ -385,11 +385,3 @@ else:
     
     **Note:** Larger images will take longer to process
     """)
-
-# Footer
-st.markdown("---")
-st.markdown(
-    "**Multi-Tool Application** | "
-    "Runge-Kutta Solver • Image Converter | "
-    "Made with Streamlit"
-)
