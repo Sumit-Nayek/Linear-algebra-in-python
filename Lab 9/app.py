@@ -3,7 +3,7 @@ import numpy as np
 
 st.set_page_config(page_title="Graph Analysis Tool", layout="wide")
 
-st.title(" Graph Analysis Tool")
+st.title("🎯 Graph Analysis Tool")
 st.markdown("---")
 
 # Initialize session state
@@ -28,7 +28,7 @@ method = st.selectbox(
 )
 
 if method == "Adjacency Matrix":
-    st.header(" Adjacency Matrix Creator")
+    st.header("📊 Adjacency Matrix Creator")
     
     col1, col2 = st.columns([1, 1])
     
@@ -61,41 +61,28 @@ if method == "Adjacency Matrix":
         st.session_state.edges_input = edges_input
     
     with col2:
-        st.subheader("Instructions & Examples")
+        st.subheader("Instructions")
         st.info("""
         **Adjacency Matrix:**
         - Square matrix representing the graph
         - Rows and columns represent vertices
         - 1 indicates an edge between vertices
         - 0 indicates no edge
+        
+        **Example Input:**
+        - Vertices: 4
+        - Edges: 
+          0,1
+          1,2  
+          2,3
+          3,0
+        
+        Creates a 4x4 matrix with 1s at 
+        positions (0,1), (1,2), (2,3), (3,0)
         """)
-        
-        # Quick examples with SIMPLE handling
-        st.markdown("**Quick Examples:**")
-        
-        example_data = {
-            "Triangle Graph": {"vertices": 3, "edges": "0,1\n1,2\n2,0"},
-            "Path Graph (4 vertices)": {"vertices": 4, "edges": "0,1\n1,2\n2,3"},
-            "Star Graph": {"vertices": 4, "edges": "0,1\n0,2\n0,3"},
-            "Complete Graph K3": {"vertices": 3, "edges": "0,1\n0,2\n1,2"},
-            "Square Graph": {"vertices": 4, "edges": "0,1\n1,2\n2,3\n3,0\n0,2"}
-        }
-        
-        selected_example = st.selectbox(
-            "Load example graph:",
-            ["Select an example"] + list(example_data.keys()),
-            key="example_selector"
-        )
-        
-        if selected_example != "Select an example":
-            if st.button("Apply This Example", key="apply_example_btn"):
-                example = example_data[selected_example]
-                st.session_state.vertices = example["vertices"]
-                st.session_state.edges_input = example["edges"]
-                st.rerun()
 
     # Process edges and create adjacency matrix
-    if st.button(" Create Adjacency Matrix", type="primary", key="create_matrix"):
+    if st.button("🚀 Create Adjacency Matrix", type="primary", key="create_matrix"):
         if num_vertices <= 0:
             st.error("Number of vertices must be positive")
         elif not edges_input.strip():
@@ -137,7 +124,7 @@ if method == "Adjacency Matrix":
                 st.session_state.vertices = num_vertices
                 
                 # Show results
-                st.success(f" Matrix created successfully!")
+                st.success(f"✅ Matrix created successfully!")
                 st.write(f"**Valid edges processed:** {valid_edges}")
                 
                 # Show warnings for invalid edges
@@ -153,7 +140,7 @@ if method == "Adjacency Matrix":
 
     # Display results
     if st.session_state.adj_matrix is not None:
-        st.subheader("Results")
+        st.subheader("📋 Results")
         
         adj_matrix = st.session_state.adj_matrix
         edges = st.session_state.edges
@@ -167,7 +154,7 @@ if method == "Adjacency Matrix":
             st.write("**Edge list:**", edges)
             
             # Display matrix in a nice format
-            st.subheader("Adjacency Matrix")
+            st.subheader("🧮 Adjacency Matrix")
             
             # Create HTML table for matrix
             matrix_html = """
@@ -196,11 +183,11 @@ if method == "Adjacency Matrix":
         
         with col_res2:
             # Display matrix as code
-            st.subheader("Python Code")
+            st.subheader("🔢 Python Code")
             st.code(f"import numpy as np\n\n# Adjacency matrix for graph with {len(adj_matrix)} vertices\nadj_matrix = np.array({adj_matrix.tolist()})")
             
             # Degree information
-            st.subheader(" Vertex Degrees")
+            st.subheader("📈 Vertex Degrees")
             total_degree = 0
             for i in range(len(adj_matrix)):
                 degree = np.sum(adj_matrix[i])
@@ -241,7 +228,7 @@ if method == "Adjacency Matrix":
             st.write(f"**Is connected:** {is_connected(adj_matrix)}")
 
 else:  # Bipartite Check
-    st.header(" Bipartite Graph Checker")
+    st.header("🎨 Bipartite Graph Checker")
     
     col1, col2 = st.columns([1, 1])
     
@@ -272,7 +259,7 @@ else:  # Bipartite Check
                 value=st.session_state.bipartite_edges_input,
                 height=150,
                 key="bipartite_edges_area",
-                help="Example bipartite graph:\n0,1\n0,3\n1,2\n2,3"
+                help="Example: 0,1 for edge between vertex 0 and 1"
             )
             st.session_state.bipartite_edges_input = bipartite_edges_input
             
@@ -296,29 +283,11 @@ else:  # Bipartite Check
         - Every edge connects vertices from different sets
         - No edge between vertices in the same set
         - Can be colored with 2 colors
+        
+        **Examples:**
+        - Bipartite: 0,1 and 1,2 and 2,3 and 3,0
+        - Not Bipartite: 0,1 and 1,2 and 2,0 (triangle)
         """)
-        
-        # Bipartite examples with SIMPLE handling
-        st.markdown("**Bipartite Examples:**")
-        
-        bipartite_examples = {
-            "Simple Bipartite": {"vertices": 4, "edges": "0,1\n0,3\n1,2\n2,3"},
-            "Tree (always bipartite)": {"vertices": 5, "edges": "0,1\n0,2\n1,3\n1,4"},
-            "Non-Bipartite (triangle)": {"vertices": 3, "edges": "0,1\n1,2\n2,0"},
-            "Bipartite Star": {"vertices": 5, "edges": "0,1\n0,2\n0,3\n0,4"}
-        }
-        
-        selected_bip_example = st.selectbox(
-            "Load example graph:",
-            ["Select an example"] + list(bipartite_examples.keys()),
-            key="bip_example_selector"
-        )
-        
-        if selected_bip_example != "Select an example":
-            if st.button("Apply This Example", key="apply_bip_example_btn"):
-                example = bipartite_examples[selected_bip_example]
-                st.session_state.bipartite_edges_input = example["edges"]
-                st.rerun()
 
     # Bipartite check function
     def is_bipartite(adj_matrix):
@@ -444,11 +413,6 @@ else:  # Bipartite Check
             - Contains odd-length cycles
             - Cannot be colored with 2 colors
             - Vertices cannot be divided into two independent sets
-            
-            **Common non-bipartite graphs:**
-            • Triangles (3-cycles)
-            • Any graph with odd cycles
-            • Complete graphs with odd number of vertices
             """)
 
 # Instructions section
@@ -460,9 +424,8 @@ if method == "Adjacency Matrix":
     ### Adjacency Matrix Instructions:
     1. **Enter number of vertices** (1-20)
     2. **Enter edges** as comma-separated pairs, one per line
-    3. **Use examples** for quick testing
-    4. **Click 'Create Adjacency Matrix'** to generate
-    5. **View results** including visualization and properties
+    3. **Click 'Create Adjacency Matrix'** to generate
+    4. **View results** including visualization and properties
     
     **Edge Format:**
     ```
@@ -470,14 +433,19 @@ if method == "Adjacency Matrix":
     1,2    # Edge between vertex 1 and 2  
     2,3    # Edge between vertex 2 and 3
     ```
+    
+    **Note:** The graph is undirected (edges are bidirectional)
     """)
 else:
     st.markdown("""
     ### Bipartite Check Instructions:
     1. **Choose input method** - manual or previous matrix
-    2. **Enter graph data** or use examples
+    2. **Enter graph data** (vertices and edges)
     3. **Click 'Check Bipartite'** to analyze
     4. **View results** - status and vertex sets if bipartite
     
-    **Tip:** Try the examples to see both bipartite and non-bipartite graphs!
+    **What makes a graph bipartite:**
+    - Can be colored with exactly 2 colors
+    - No edges between vertices of the same color
+    - All cycles have even length
     """)
