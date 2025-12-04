@@ -332,8 +332,7 @@ This repository presents implementations of basic linear algebra operations in P
 
 ##  Features
 
-- Core implementations of linear algebra operations using pure Python and/or NumPy  
-- Clean, modular structure: e.g., `vector.py`, `matrix.py`, `solvers.py`, `notebooks/`  
+- Core implementations of linear algebra operations using pure Python and/or NumPy   
 - Annotated Jupyter notebooks with visualizations (if present)  
 - Educational comments and docstrings explaining mathematical concepts  
 
