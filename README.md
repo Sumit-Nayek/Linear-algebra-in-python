@@ -315,15 +315,6 @@
 </p>
 
 ---
-
-##  Table of Contents
-
-- [Overview](#overview)  
-- [Features](#features)  
-- [Getting Started](#getting-started)  
-
----
-
 ##  Overview
 
 This repository presents implementations of basic linear algebra operations in Python—such as dot products, matrix multiplication, solving linear systems, vector spaces, and more—designed to reinforce understanding in the context of machine learning labs and educational exercises.
