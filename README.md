@@ -328,10 +328,7 @@ This repository presents implementations of basic linear algebra operations in P
 - Educational comments and docstrings explaining mathematical concepts  
 
 ---
-
-##  Getting Started
-
-### Prerequisites
+## Prerequisites
 
 - Python 3.7 or higher  
 - Recommended packages (e.g., NumPy, Matplotlib, pandas, docx etc.) if used:
